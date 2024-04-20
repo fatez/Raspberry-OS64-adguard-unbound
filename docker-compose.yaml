@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  adguard-unbound:
+    container_name: adguard-unbound
+    image: dartsteven/raspberry-adguard-unbound
+    restart: unless-stopped
+    hostname: adguard-unbound
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - ./etc/hosts:/etc/hosts
+      - "./adguard/opt-adguard-work:/opt/adguardhome/work" # adguard container work directory
+      - "./adguard/opt-adguard-conf:/opt/adguardhome/conf" # adguard container conf directory
+      - "./unbound:/opt/unbound" # map custom unbound config
+      - "/usr/share/dns:/usr/share/dns" # map DNSSEC key and root hints from dns-root-data package
+    ports:
+      - 53:53/tcp # AdGuard Home DNS connection
+      - 53:53/udp # AdGuard Home DNS connection
+      - 3001:3000/tcp # AdGuard Home install web panel. Can disable after installation is completed. : change 3001 if you want
+      - 81:80/tcp # AdGuard Home web panel HTTP : change 81 if you want
+      - 5053:5053/tcp # Uncomment to enable unbound access on local server
+      - 5053:5053/udp # Uncomment to enable unbound access on local server
+      - 5443:5443/tcp
+      # DNSCrypt
+      - 5443:5443/udp
+      - 6060:6060/tcp
+      # DNS-over-TLS
+      - 853:853/tcp
+      # DNS-over-QUIC
+      - 784:784/udp
+      - 853:853/udp
+      - 8853:8853/udp
